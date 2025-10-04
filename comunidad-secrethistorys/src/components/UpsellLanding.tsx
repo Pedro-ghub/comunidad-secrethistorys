@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, MessageCircle, Heart, Check, X, Shield, Star, Gift } from 'lucide-react';
+import { Users, MessageCircle, Heart, Shield, Star, Gift } from 'lucide-react';
 import heroImage from '@/assets/hero-romance.jpg';
+
+// Declaração de tipo para o window.checkoutElements
+declare global {
+  interface Window {
+    checkoutElements: {
+      init: (type: string) => {
+        mount: (selector: string) => void;
+      };
+    };
+  }
+}
 
 const UpsellLanding = () => {
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutos em segundos
@@ -19,6 +29,63 @@ const UpsellLanding = () => {
     }, 1000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Hotmart Sales Funnel Widget
+  useEffect(() => {
+    const loadHotmartScript = () => {
+      // Verifica se o script já foi carregado
+      if (window.checkoutElements) {
+        // Monta o widget no primeiro elemento
+        const element1 = document.getElementById('hotmart-sales-funnel');
+        if (element1) {
+          window.checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel');
+        }
+        
+        // Monta o widget no segundo elemento
+        const element2 = document.getElementById('hotmart-sales-funnel-2');
+        if (element2) {
+          window.checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel-2');
+        }
+        return;
+      }
+
+      // Carrega o script da Hotmart
+      const script = document.createElement('script');
+      script.src = 'https://checkout.hotmart.com/lib/hotmart-checkout-elements.js';
+      script.onload = () => {
+        if (window.checkoutElements) {
+          // Aguarda um pouco para garantir que os elementos existem
+          setTimeout(() => {
+            const element1 = document.getElementById('hotmart-sales-funnel');
+            if (element1) {
+              window.checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel');
+            }
+            
+            const element2 = document.getElementById('hotmart-sales-funnel-2');
+            if (element2) {
+              window.checkoutElements.init('salesFunnel').mount('#hotmart-sales-funnel-2');
+            }
+          }, 100);
+        }
+      };
+      document.head.appendChild(script);
+    };
+
+    // Aguarda o DOM estar pronto
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadHotmartScript);
+    } else {
+      loadHotmartScript();
+    }
+
+    return () => {
+      // Cleanup se necessário
+      const existingScript = document.querySelector('script[src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
   }, []);
 
   const formatTime = (seconds: number) => {
@@ -217,41 +284,9 @@ const UpsellLanding = () => {
             </div>
           </div>
 
-          {/* Call to Action Button */}
+          {/* HOTMART - Sales Funnel Widget */}
           <div className="max-w-md mx-auto mt-8">
-            <Button
-              variant="hero"
-              size="xl"
-              className="w-full py-4 sm:py-6 px-3 sm:px-6 text-xs sm:text-base font-bold leading-tight sm:leading-relaxed min-h-[50px] sm:min-h-[60px] relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(45deg, #ec4899, #be185d, #ec4899, #f472b6, #ec4899)',
-                backgroundSize: '300% 300%',
-                animation: 'gradientShift 3s ease infinite'
-              }}
-              onClick={() => {
-                const offerSection = document.querySelector('[data-section="offer"]');
-                if (offerSection) {
-                  offerSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            >
-              <Check className="w-3 h-3 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0 relative z-10" />
-              <span className="text-center leading-tight sm:leading-relaxed break-words relative z-10">SÍ, QUIERO UNIRME A LA COMUNIDAD</span>
-
-              <style jsx>{`
-                 @keyframes gradientShift {
-                   0% {
-                     background-position: 0% 50%;
-                   }
-                   50% {
-                     background-position: 100% 50%;
-                   }
-                   100% {
-                     background-position: 0% 50%;
-                   }
-                 }
-               `}</style>
-            </Button>
+            <div id="hotmart-sales-funnel"></div>
           </div>
         </div>
       </div>
@@ -572,90 +607,10 @@ const UpsellLanding = () => {
               </p>
             </div>
 
-            {/* Action Buttons */}
+            {/* HOTMART - Sales Funnel Widget */}
             <div className="space-y-4">
               <div className="flex flex-col items-center gap-6">
-                {/* Botão SIM com texto abaixo */}
-                <div className="flex flex-col items-center gap-3">
-                  <a
-                    href="https://wa.me/1234567890?text=Hola!%20Quiero%20unirme%20a%20la%20comunidad%20exclusiva%20de%20Secret%20Historys"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="button-default button-accept w-full max-w-md flex items-center justify-center"
-                    style={{
-                      padding: '17px 32px',
-                      lineHeight: '22px',
-                      borderRadius: '12px',
-                      fontWeight: '700',
-                      background: 'linear-gradient(45deg, #ec4899, #be185d, #ec4899, #f472b6, #ec4899)',
-                      backgroundSize: '300% 300%',
-                      animation: 'gradientShift 3s ease infinite',
-                      color: 'rgb(255, 255, 255)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      border: 'none',
-                      fontSize: '16px',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      textAlign: 'center',
-                      textDecoration: 'none'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.02)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="text-center">SÍ, QUIERO UNIRME A LA COMUNIDAD</span>
-                  </a>
-
-                  {/* Texto abaixo do botão SIM */}
-                  <p className="text-xs sm:text-sm text-accent font-semibold">
-                    🔒 Acceso de por vida. Garantizado.
-                  </p>
-                </div>
-
-                {/* Botão NÃO com texto abaixo */}
-                <div className="flex flex-col items-center gap-3">
-                  <div
-                    className="button-default button-deny w-full max-w-md text-center"
-                    style={{
-                      textDecoration: 'underline',
-                      lineHeight: '22px',
-                      fontSize: '16px',
-                      fontWeight: '700',
-                      color: 'rgb(255, 255, 255)',
-                      cursor: 'pointer',
-                      padding: '12px 20px',
-                      transition: 'all 0.3s ease',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                      e.currentTarget.style.transform = 'scale(1.02)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                    onClick={() => {
-                      // Redirecionar para a página principal ou dashboard
-                      window.location.href = 'https://lastlink.com/app/member/dashboardV2';
-                    }}
-                  >
-                    <X className="w-4 h-4 mr-2 inline-block" />
-                    Prefiero seguir leyendo las historias comunes...
-                  </div>
-
-                  {/* Texto abaixo do botão NÃO */}
-                  <p className="text-center text-xs sm:text-sm text-muted-foreground px-2">
-                    Sin acceso a la comunidad exclusiva, sin recomendaciones personalizadas y sin conexión con otras lectoras.
-                  </p>
-                </div>
+                <div id="hotmart-sales-funnel-2"></div>
 
                 {/* CSS para animação do gradiente */}
                 <style dangerouslySetInnerHTML={{
